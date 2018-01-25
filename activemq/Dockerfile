@@ -1,4 +1,4 @@
-FROM elasticsearch:5.6.4
+FROM openjdk:alpine
 
 MAINTAINER William Hearn <william.hearn@canada.ca>>
 
@@ -20,11 +20,6 @@ WORKDIR /opt
 RUN wget -qO- https://archive.apache.org/dist/activemq/$ACTIVEMQ_VERSION/apache-activemq-$ACTIVEMQ_VERSION-bin.tar.gz | tar -xz && \
     mv apache-activemq-$ACTIVEMQ_VERSION $ACTIVEMQ_HOME
 
-EXPOSE 61616
-       672
-       61613
-       1883
-       61614
-       8161
+EXPOSE 61616 672 61613 1883 61614 8161
 
 ENTRYPOINT $ACTIVEMQ_HOME/bin/activemq console
