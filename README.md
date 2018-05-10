@@ -4,4 +4,5 @@
 
 [official]:            https://kylo.io
 [kylo]:                https://github.com/Teradata/kylo
+[github]:              https://github.com/govcloud/docker-kylo
 [registry]:            https://hub.docker.com/r/govcloud/docker-kylo
