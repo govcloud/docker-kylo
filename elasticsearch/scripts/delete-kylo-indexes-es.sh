@@ -18,7 +18,7 @@ else
     exit 1
 fi
 
-kylo_indexes=kylo-data,kylo-datasources,kylo-categories-metadata,kylo-categories-default,kylo-feeds-metadata,kylo-feeds-default
+kylo_indexes=kylo-datasources,kylo-categories-metadata,kylo-categories-default,kylo-feeds-metadata,kylo-feeds-default
 
 for KYLO_INDEX in $(echo $kylo_indexes | sed "s/,/ /g")
 do
