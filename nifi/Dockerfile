@@ -1,36 +1,70 @@
-FROM govcloud/docker-nifi:latest
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements. See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership. The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License. You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied. See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
 
-MAINTAINER William Hearn <william.hearn@canada.ca>>
+FROM openjdk:8-jdk AS kylok8sBuild
+LABEL maintainer="Apache NiFi <dev@nifi.apache.org>"
+LABEL site="https://nifi.apache.org"
 
-ENV GLIBC_VERSION=2.25-r0
+ARG UID=1000
+ARG GID=1000
+
+ENV JAVA_OPTS="-Xms512M -Xmx1536M"
+ENV MAVEN_OPTS="-Xms512M -Xmx1536M"
+ENV MAVEN_SKIP_RC="true"
+
+USER root
+
+RUN apt-get update && \
+    apt-get install -y maven \
+                       rpm
+
+RUN git clone https://github.com/italia/kylo.git /opt/kylok8s && \
+    cd /opt/kylok8s && \
+    git checkout release/0.8.4-daf-kylo && \
+    git pull && \
+    mvn clean install -DskipTests
+
+RUN cd /opt/kylok8s && \
+    mkdir install/install-tar/target/kylo && \
+    tar -C install/install-tar/target/kylo -xvf install/install-tar/target/kylo-*-dependencies.tar.gz && \
+    mkdir -p /opt/nifi/kylo && \
+    cp -a install/install-tar/target/kylo/setup/nifi/. /opt/nifi/kylo
+
+##########
+
+FROM govcloud/docker-nifi:1.6.0
+LABEL maintainer="William Hearn <william.hearn@canada.ca>"
+LABEL site="https://nifi.apache.org/"
+
+ARG UID=1000
+ARG GID=1000
 
 ENV JAVA_OPTS="-Xms512M -Xmx1536M"
 
-ENV MAVEN_OPTS="-Xms512M -Xmx1536M"
+COPY --from=kylok8sBuild /opt/nifi/kylo /opt/nifi/kylo
 
-ENV MAVEN_SKIP_RC="true"
+USER root
 
-RUN wget -q -O /etc/apk/keys/sgerrand.rsa.pub https://raw.githubusercontent.com/sgerrand/alpine-pkg-glibc/master/sgerrand.rsa.pub && \
-    wget -q https://github.com/sgerrand/alpine-pkg-glibc/releases/download/$GLIBC_VERSION/glibc-$GLIBC_VERSION.apk && \
-    apk add --update --no-cache glibc-$GLIBC_VERSION.apk \
-                                git \
-                                maven && \
-    echo @community http://dl-cdn.alpinelinux.org/alpine/edge/community | tee -a /etc/apk/repositories && \
-    apk --update add rpm && \
-    rm glibc-$GLIBC_VERSION.apk
-
-RUN git clone https://github.com/fabiannecci/kylo.git /opt/kylok8s && \
-    cd /opt/kylok8s && \
-    git checkout teamdigitale && \
-    mvn clean install -DskipTests -DskipDebian && \
-    mkdir install/install-tar/target/kylo && \
-    tar -C install/install-tar/target/kylo -xvf install/install-tar/target/kylo-*-dependencies.tar.gz && \
-    cp -a install/install-tar/target/kylo/setup/nifi/. /opt/nifi/kylo && \
-    mkdir -p /opt/nifi/activemq && \
+RUN mkdir -p /opt/nifi/activemq && \
     mkdir -p /opt/nifi/drivers && \
     mkdir -p /opt/nifi/lib/app && \
     mkdir -p /opt/nifi/dump && \
-	mvn clean
+    mkdir -p /opt/nifi/drivers
 
 # Kylo JARS
 RUN ln -f -s /opt/nifi/kylo/kylo-nifi-core-service-nar-*.nar /opt/nifi/lib/kylo-nifi-core-service-nar.nar && \
@@ -42,20 +76,22 @@ RUN ln -f -s /opt/nifi/kylo/kylo-nifi-core-service-nar-*.nar /opt/nifi/lib/kylo-
     ln -f -s /opt/nifi/kylo/kylo-nifi-hadoop-service-v1-nar-*.nar /opt/nifi/lib/kylo-nifi-hadoop-service-nar.nar && \
     ln -f -s /opt/nifi/kylo/kylo-nifi-elasticsearch-v1-nar-*.nar /opt/nifi/lib/kylo-nifi-elasticsearch-nar.nar && \
     ln -f -s /opt/nifi/kylo/kylo-nifi-provenance-repo-v1.2-nar-*.nar /opt/nifi/lib/kylo-nifi-provenance-repo-nar.nar && \
-    ln -f -s /opt/nifi/kylo/kylo-spark-validate-cleanse-spark-v2-0.8.4-jar-with-dependencies.jar /opt/nifi/lib/app/kylo-spark-validate-cleanse-jar-with-dependencies.jar && \
-    ln -f -s /opt/nifi/kylo/kylo-spark-job-profiler-spark-v2-*-jar-with-dependencies.jar /opt/nifi/lib/app/kylo-spark-job-profiler-jar-with-dependencies.jar && \
-    ln -f -s /opt/nifi/kylo/kylo-spark-interpreter-spark-v2-*-jar-with-dependencies.jar /opt/nifi/lib/app/kylo-spark-interpreter-jar-with-dependencies.jar && \
+    ln -f -s /opt/nifi/kylo/kylo-spark-validate-cleanse-v2-*-jar-with-dependencies.jar /opt/nifi/lib/app/kylo-spark-validate-cleanse-jar-with-dependencies.jar && \
+    ln -f -s /opt/nifi/kylo/kylo-spark-job-profiler-v2-*-jar-with-dependencies.jar /opt/nifi/lib/app/kylo-spark-job-profiler-jar-with-dependencies.jar && \
+    ln -f -s /opt/nifi/kylo/kylo-spark-interpreter-v2-*-jar-with-dependencies.jar /opt/nifi/lib/app/kylo-spark-interpreter-jar-with-dependencies.jar && \
     wget http://central.maven.org/maven2/org/apache/activemq/activemq-all/5.15.0/activemq-all-5.15.0.jar -P /opt/nifi/activemq/ && \
     wget http://central.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/2.1.0/mariadb-java-client-2.1.0.jar -P /opt/nifi/drivers/
 
-RUN apk --update add krb5 \
-                     krb5-libs \
-                     coreutils \
-                     cyrus-sasl \
-                     python \
-                     python3 \
-                     python3-dev \
-                     sudo && \
-    python3 -m ensurepip && \
-    rm -r /usr/lib/python*/ensurepip && \
-    pip3 install --upgrade pip setuptools
+# Impala JDBC driver
+RUN wget -q https://downloads.cloudera.com/connectors/impala_jdbc_2.5.42.1062.zip && \
+    unzip impala_jdbc_2.5.42.1062.zip && \
+    unzip ClouderaImpalaJDBC-2.5.42.1062/ClouderaImpalaJDBC4_2.5.42.zip && \
+    mkdir -p /opt/nifi/drivers/impala && \
+    mv ClouderaImpalaJDBC4_2.5.42/* /opt/nifi/drivers/impala
+
+# Web HTTP(s) & Socket Site-to-Site Ports
+EXPOSE 8080 8443 10000
+
+# Apply configuration and start NiFi
+ENTRYPOINT      ["/docker-entrypoint.sh"]
+CMD             ["bin/nifi.sh", "run"]
