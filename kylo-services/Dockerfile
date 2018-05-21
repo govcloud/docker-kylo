@@ -64,22 +64,22 @@ ENV SPARK_HOME=/opt/cloudera/parcels/SPARK2/lib/spark2
 
 COPY --from=kylok8sBuild /opt/kylo /opt/kylo
 
-# USER root
+USER root
 
-# RUN rm -f /opt/kylo/kylo-services/lib/jetty* && \
-#     rm -f /opt/kylo/kylo-services/lib/servlet-api* && \
-#     adduser --system --shell /bin/bash kylo && \
-#     addgroup kylo && \
-#     adduser kylo kylo && \
-#     chown -R kylo:kylo /opt/kylo
+RUN rm -f /opt/kylo/kylo-services/lib/jetty* && \
+    rm -f /opt/kylo/kylo-services/lib/servlet-api* && \
+    adduser --system --shell /bin/bash kylo && \
+    addgroup kylo && \
+    adduser kylo kylo && \
+    chown -R kylo:kylo /opt/kylo
 
 # Impala JDBC driver
-# RUN wget -q https://downloads.cloudera.com/connectors/impala_jdbc_2.5.42.1062.zip && \
-#     unzip impala_jdbc_2.5.42.1062.zip && \
-#     unzip ClouderaImpalaJDBC-2.5.42.1062/ClouderaImpalaJDBC4_2.5.42.zip && \
-#     mv ClouderaImpalaJDBC4_2.5.42/ImpalaJDBC4.jar /opt/kylo/kylo-services/plugin && \
-#     mv ClouderaImpalaJDBC4_2.5.42/TCLIServiceClient.jar /opt/kylo/kylo-services/plugin && \
-#     mv ClouderaImpalaJDBC4_2.5.42/ql.jar /opt/kylo/kylo-services/plugin
+RUN wget -q https://downloads.cloudera.com/connectors/impala_jdbc_2.5.42.1062.zip && \
+    unzip impala_jdbc_2.5.42.1062.zip && \
+    unzip ClouderaImpalaJDBC-2.5.42.1062/ClouderaImpalaJDBC4_2.5.42.zip && \
+    mv ClouderaImpalaJDBC4_2.5.42/ImpalaJDBC4.jar /opt/kylo/kylo-services/plugin && \
+    mv ClouderaImpalaJDBC4_2.5.42/TCLIServiceClient.jar /opt/kylo/kylo-services/plugin && \
+    mv ClouderaImpalaJDBC4_2.5.42/ql.jar /opt/kylo/kylo-services/plugin
 
 EXPOSE 8420
 

@@ -80,7 +80,7 @@ RUN ln -f -s /opt/nifi/kylo/kylo-nifi-core-service-nar-*.nar /opt/nifi/lib/kylo-
     ln -f -s /opt/nifi/kylo/kylo-spark-job-profiler-v2-*-jar-with-dependencies.jar /opt/nifi/lib/app/kylo-spark-job-profiler-jar-with-dependencies.jar && \
     ln -f -s /opt/nifi/kylo/kylo-spark-interpreter-v2-*-jar-with-dependencies.jar /opt/nifi/lib/app/kylo-spark-interpreter-jar-with-dependencies.jar && \
     wget http://central.maven.org/maven2/org/apache/activemq/activemq-all/5.15.0/activemq-all-5.15.0.jar -P /opt/nifi/activemq/ && \
-    wget http://central.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/2.1.0/mariadb-java-client-2.1.0.jar -P /opt/nifi/drivers/
+    wget http://central.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/2.2.4/mariadb-java-client-2.2.4.jar -P /opt/nifi/drivers/
 
 # Impala JDBC driver
 RUN wget -q https://downloads.cloudera.com/connectors/impala_jdbc_2.5.42.1062.zip && \
