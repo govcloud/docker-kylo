@@ -66,6 +66,11 @@ COPY --from=kylok8sBuild /opt/kylo /opt/kylo
 
 USER root
 
+RUN apt-get update && \
+    apt-get install -y mysql-client \
+                       ca-certificates \
+                       libkrb5-dev
+
 RUN rm -f /opt/kylo/kylo-services/lib/jetty* && \
     rm -f /opt/kylo/kylo-services/lib/servlet-api* && \
     adduser --system --shell /bin/bash kylo && \
