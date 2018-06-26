@@ -33,10 +33,9 @@ RUN apt-get update && \
     apt-get install -y maven \
                        rpm
 
-RUN git clone https://github.com/italia/kylo.git /opt/kylok8s && \
+RUN git clone https://github.com/teradata/kylo.git /opt/kylok8s && \
     cd /opt/kylok8s && \
-    git checkout release/0.8.4-daf-kylo && \
-    git pull && \
+    git checkout tags/v0.9.1 && \
     mvn clean install -DskipTests
 
 RUN cd /opt/kylok8s && \
