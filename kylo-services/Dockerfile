@@ -59,7 +59,7 @@ ARG GID=1000
 
 ENV JAVA_OPTS="-Xms512M -Xmx1536M"
 
-ENV SPARK_HOME=/opt/cloudera/parcels/SPARK2/lib/spark2
+ENV SPARK_HOME=/opt/spark
 
 COPY --from=kylok8sBuild /opt/kylo /opt/kylo
 
@@ -84,6 +84,12 @@ RUN wget -q https://downloads.cloudera.com/connectors/impala_jdbc_2.5.42.1062.zi
     mv ClouderaImpalaJDBC4_2.5.42/ImpalaJDBC4.jar /opt/kylo/kylo-services/plugin && \
     mv ClouderaImpalaJDBC4_2.5.42/TCLIServiceClient.jar /opt/kylo/kylo-services/plugin && \
     mv ClouderaImpalaJDBC4_2.5.42/ql.jar /opt/kylo/kylo-services/plugin
+
+# Spark
+RUN cd /opt && wget -q https://archive.apache.org/dist/spark/spark-2.3.1/spark-2.3.1-bin-hadoop2.6.tgz && \
+  tar -xzf spark-2.3.1-bin-hadoop2.6.tgz && \
+  ln -s spark-2.3.1-bin-hadoop2.6 spark && \
+  rm spark-2.3.1-bin-hadoop2.6.tgz
 
 EXPOSE 8420
 
