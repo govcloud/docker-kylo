@@ -41,8 +41,8 @@ RUN git clone https://github.com/teradata/kylo.git /opt/kylok8s && \
 RUN cd /opt/kylok8s && \
     mkdir install/install-tar/target/kylo && \
     tar -C install/install-tar/target/kylo -xvf install/install-tar/target/kylo-*-dependencies.tar.gz && \
-    mkdir -p /opt/nifi/kylo && \
-    cp -a install/install-tar/target/kylo/setup/nifi/. /opt/nifi/kylo
+    mkdir -p /opt/nifi/data/lib && \
+    cp -a install/install-tar/target/kylo/setup/nifi/. /opt/nifi/data/lib
 
 ##########
 
@@ -55,7 +55,7 @@ ARG GID=1000
 
 ENV JAVA_OPTS="-Xms512M -Xmx1536M"
 
-COPY --from=kylok8sBuild /opt/nifi/kylo /opt/nifi/kylo
+COPY --from=kylok8sBuild /opt/nifi/data/lib /opt/nifi/data/lib
 
 USER root
 
@@ -75,7 +75,7 @@ RUN cd /opt && wget -q https://archive.apache.org/dist/spark/spark-2.3.1/spark-2
 ENV PATH=$PATH:/opt/spark/bin
 
 # Kylo JARS
-RUN /opt/nifi/kylo/create-symbolic-links.sh /opt/nifi nifi nifi && \
+RUN /opt/nifi/data/lib/create-symbolic-links.sh /opt/nifi nifi nifi && \
     wget http://central.maven.org/maven2/org/apache/activemq/activemq-all/5.15.0/activemq-all-5.15.0.jar -P /opt/nifi/activemq/ && \
     wget http://central.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/2.2.4/mariadb-java-client-2.2.4.jar -P /opt/nifi/drivers/ && \
     wget http://central.maven.org/maven2/org/apache/hive/hcatalog/hive-hcatalog-core/2.3.2/hive-hcatalog-core-2.3.2.jar -P /opt/nifi/drivers/
