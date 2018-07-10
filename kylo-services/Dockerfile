@@ -35,7 +35,7 @@ RUN apt-get update && \
 
 RUN git clone https://github.com/teradata/kylo.git /opt/kylok8s && \
     cd /opt/kylok8s && \
-    git checkout tags/v0.9.1 && \
+    git checkout tags/v0.9.1.1 && \
     mvn clean install -DskipTests
 
 RUN cd /opt/kylok8s && \
