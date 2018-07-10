@@ -64,6 +64,10 @@ RUN mkdir -p /opt/nifi/activemq && \
     mkdir -p /opt/nifi/nifi-1.6.0/lib/app && \
     mkdir -p /opt/nifi/dump && \
     mkdir -p /opt/nifi/drivers && \
+    mkdir -p /opt/fake_data && \
+    mkdir -p /var/dropzone && \
+    chown -R nifi:nifi /var/dropzone && \
+    chown -R nifi:nifi /opt/fake_data && \
     ln -f -s /opt/nifi/nifi-1.6.0 /opt/nifi/current
 
 # Spark
