@@ -41,8 +41,9 @@ RUN git clone https://github.com/teradata/kylo.git /opt/kylok8s && \
 RUN cd /opt/kylok8s && \
     mkdir install/install-tar/target/kylo && \
     tar -C install/install-tar/target/kylo -xvf install/install-tar/target/kylo-*-dependencies.tar.gz && \
-    mkdir -p /opt/nifi/data/lib && \
-    cp -a install/install-tar/target/kylo/setup/nifi/. /opt/nifi/data/lib
+    mkdir -p /opt/nifi/data/lib/app && \
+    cp -a install/install-tar/target/kylo/setup/nifi/. /opt/nifi/data/lib && \
+    mv /opt/nifi/data/lib/kylo-spark-*.jar /opt/nifi/data/lib/app
 
 ##########
 
