@@ -85,7 +85,7 @@ RUN /opt/nifi/data/lib/create-symbolic-links.sh /opt/nifi nifi nifi && \
     wget http://central.maven.org/maven2/org/apache/activemq/activemq-all/5.15.0/activemq-all-5.15.0.jar -P /opt/nifi/activemq/ && \
     wget http://central.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/2.2.4/mariadb-java-client-2.2.4.jar -P /opt/nifi/drivers/ && \
     wget http://central.maven.org/maven2/org/apache/hive/hcatalog/hive-hcatalog-core/2.3.2/hive-hcatalog-core-2.3.2.jar -P /opt/nifi/drivers/ && \
-    wget https://jdbc.postgresql.org/download/postgresql-42.2.4.jar -P /opt/spark/lib/
+    wget https://jdbc.postgresql.org/download/postgresql-42.2.4.jar -P /opt/spark/jars/
 
 # Impala JDBC driver
 RUN wget -q https://downloads.cloudera.com/connectors/impala_jdbc_2.5.42.1062.zip && \
